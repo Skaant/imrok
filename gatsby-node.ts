@@ -1,6 +1,10 @@
 import type { GatsbyNode } from "gatsby";
 import { Client } from "@notionhq/client";
-import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import {
+  BlockObjectResponse,
+  PageObjectResponse,
+  TextRichTextItemResponse,
+} from "@notionhq/client/build/src/api-endpoints";
 import path from "path";
 
 // Initializing a client
@@ -10,25 +14,32 @@ const notion = new Client({
 
 export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   const { createPage } = actions;
-  const res = await notion.databases.query({
+  const { results: pages } = await notion.databases.query({
     database_id: process.env.DATABASE_ID as string,
     filter: { property: "Contexte", select: { equals: "Page" } },
   });
 
-  res.results.map((page) => {
-    console.log(
-      ((page as PageObjectResponse).properties["Name"] as any).title[0]
-    );
-    console.log(
-      ((page as PageObjectResponse).properties["Name"] as any).title[0].text
-        .content
-    );
+  const _pages = await Promise.all(
+    pages.map(async (page) => {
+      console.log(page);
+      const { results: blocks } = await notion.blocks.children.list({
+        block_id: page.id,
+      });
+      return { page, blocks };
+    })
+  );
+
+  _pages.forEach(({ page, blocks }) => {
     createPage({
       component: path.resolve("./src/templates/default.template.tsx"),
       path: page.id,
       context: {
-        title: ((page as PageObjectResponse).properties["Name"] as any).title[0]
-          .text.content,
+        title: (
+          (page as PageObjectResponse).properties["Name"] as {
+            title: TextRichTextItemResponse[];
+          }
+        ).title[0].text.content,
+        blocks: blocks as BlockObjectResponse[],
       },
     });
   });
