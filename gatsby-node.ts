@@ -21,7 +21,6 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
 
   const _pages = await Promise.all(
     pages.map(async (page) => {
-      console.log(page);
       const { results: blocks } = await notion.blocks.children.list({
         block_id: page.id,
       });

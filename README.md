@@ -14,6 +14,7 @@ Its two main purposes are :
 A `.env.development` file must be created at the root of the project, with given properties filled :
 
 ```.env
+WEBSITE_TITLE=
 NOTION_TOKEN=
 DATABASE_ID=
 ```

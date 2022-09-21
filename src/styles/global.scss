@@ -22,7 +22,15 @@
 @import "../../node_modules/bootstrap/scss/grid";
 @import "../../node_modules/bootstrap/scss/helpers";
 
+@import "../../node_modules/bootstrap/scss/navbar";
+
 // 7. Optionally include utilities API last to generate classes based on the Sass map in `_utilities.scss`
 @import "../../node_modules/bootstrap/scss/utilities/api";
 
 // 8. Add additional custom code here
+#main.container {
+  max-width: 800px;
+}
+#page-header {
+  padding-top: 25vh;
+}

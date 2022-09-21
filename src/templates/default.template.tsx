@@ -6,14 +6,17 @@ import { PageProps } from "gatsby";
 import React from "react";
 import ImageBlock from "../components/blocks/ImageBlock";
 import ParagraphBlock from "../components/blocks/ParagraphBlock";
+import Layout from "../components/layout/Layout";
 import "../styles/global.scss";
 
 const DefaultTemplate = ({
   pageContext: { title, blocks },
 }: PageProps<undefined, { title: string; blocks: BlockObjectResponse[] }>) => (
-  <div>
+  <Layout>
     <>
-      <h1>{title}</h1>
+      <div id="page-header" className="mb-5">
+        <h1>{title}</h1>
+      </div>
       {blocks.map((block) => {
         switch (block.type) {
           case "paragraph":
@@ -31,7 +34,7 @@ const DefaultTemplate = ({
         }
       })}
     </>
-  </div>
+  </Layout>
 );
 
 export default DefaultTemplate;
