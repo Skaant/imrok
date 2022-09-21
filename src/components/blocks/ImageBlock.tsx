@@ -1,15 +1,29 @@
-import { ImageBlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import {
+  ImageBlockObjectResponse,
+  TextRichTextItemResponse,
+} from "@notionhq/client/build/src/api-endpoints";
 import React from "react";
+import RichTextRenderer from "../RichTextRenderer";
 
 export default function ImageBlock({
   block,
 }: {
   block: ImageBlockObjectResponse;
 }) {
-  const blockImage = block.image;
-  if (blockImage.type === "external") {
-    return <img src={blockImage.external.url} />;
-  } else {
-    return <img src={blockImage.file.url} />;
-  }
+  return (
+    <>
+      {block.image.type === "external" ? (
+        <img src={block.image.external.url} />
+      ) : (
+        <img src={block.image.file.url} />
+      )}
+      {block.image.caption && (
+        <p className="small">
+          <RichTextRenderer
+            richTexts={block.image.caption as TextRichTextItemResponse[]}
+          />
+        </p>
+      )}
+    </>
+  );
 }
