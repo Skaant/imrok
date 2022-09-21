@@ -6,6 +6,7 @@ import {
   TextRichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import path from "path";
+import richTextToString from "./src/helpers/richTextToString";
 
 // Initializing a client
 const notion = new Client({
@@ -14,13 +15,14 @@ const notion = new Client({
 
 export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   const { createPage } = actions;
+
   const { results: pages } = await notion.databases.query({
     database_id: process.env.DATABASE_ID as string,
     filter: { property: "Contexte", select: { equals: "Page" } },
   });
 
   const _pages = await Promise.all(
-    pages.map(async (page) => {
+    (pages as PageObjectResponse[]).map(async (page) => {
       const { results: blocks } = await notion.blocks.children.list({
         block_id: page.id,
       });
@@ -29,15 +31,49 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   );
 
   _pages.forEach(({ page, blocks }) => {
+    const { Name: name, Url: url } = page.properties;
+
     createPage({
       component: path.resolve("./src/templates/default.template.tsx"),
-      path: page.id,
+      path:
+        url.type === "rich_text"
+          ? richTextToString(url.rich_text as TextRichTextItemResponse[])
+          : page.id,
       context: {
-        title: (
-          (page as PageObjectResponse).properties["Name"] as {
-            title: TextRichTextItemResponse[];
-          }
-        ).title[0].text.content,
+        title:
+          name.type === "title" &&
+          (name.title[0] as TextRichTextItemResponse).text.content,
+        blocks: blocks as BlockObjectResponse[],
+      },
+    });
+  });
+
+  const { results: contents } = await notion.databases.query({
+    database_id: process.env.DATABASE_ID as string,
+    filter: { property: "Contexte", select: { equals: "Contenu" } },
+  });
+
+  const _contents = await Promise.all(
+    (contents as PageObjectResponse[]).map(async (content) => {
+      const { results: blocks } = await notion.blocks.children.list({
+        block_id: content.id,
+      });
+      return { content, blocks };
+    })
+  );
+
+  _contents.forEach(({ content, blocks }) => {
+    const { Name: name, Url: url } = content.properties;
+    createPage({
+      component: path.resolve("./src/templates/default.template.tsx"),
+      path:
+        url.type === "rich_text"
+          ? richTextToString(url.rich_text as TextRichTextItemResponse[])
+          : content.id,
+      context: {
+        title:
+          name.type === "title" &&
+          (name.title[0] as TextRichTextItemResponse).text.content,
         blocks: blocks as BlockObjectResponse[],
       },
     });
