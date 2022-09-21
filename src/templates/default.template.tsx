@@ -6,6 +6,7 @@ import { PageProps } from "gatsby";
 import React from "react";
 import ImageBlock from "../components/blocks/ImageBlock";
 import ParagraphBlock from "../components/blocks/ParagraphBlock";
+import "../styles/global.scss";
 
 const DefaultTemplate = ({
   pageContext: { title, blocks },
