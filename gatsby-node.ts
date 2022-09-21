@@ -7,6 +7,7 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import path from "path";
 import richTextToString from "./src/helpers/richTextToString";
+import { DefaultTemplateContext } from "./src/templates/default.template";
 
 // Initializing a client
 const notion = new Client({
@@ -44,7 +45,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
           name.type === "title" &&
           (name.title[0] as TextRichTextItemResponse).text.content,
         blocks: blocks as BlockObjectResponse[],
-      },
+      } as DefaultTemplateContext,
     });
   });
 
@@ -63,7 +64,11 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   );
 
   _contents.forEach(({ content, blocks }) => {
-    const { Name: name, Url: url } = content.properties;
+    const { Name: name, Url: url, ["Créé le"]: date } = content.properties;
+    let _date;
+    if (date.type === "date" && date.date) {
+      _date = new Date(date.date.start);
+    }
     createPage({
       component: path.resolve("./src/templates/default.template.tsx"),
       path:
@@ -74,8 +79,9 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
         title:
           name.type === "title" &&
           (name.title[0] as TextRichTextItemResponse).text.content,
+        date: _date,
         blocks: blocks as BlockObjectResponse[],
-      },
+      } as DefaultTemplateContext,
     });
   });
 };

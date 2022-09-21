@@ -5,6 +5,7 @@ import {
 import React from "react";
 import ImageBlock from "./blocks/ImageBlock";
 import ParagraphBlock from "./blocks/ParagraphBlock";
+import VideoBlock from "./blocks/VideoBlock";
 
 export default function BlockSwitch({ block }: { block: BlockObjectResponse }) {
   switch (block.type) {
@@ -17,6 +18,8 @@ export default function BlockSwitch({ block }: { block: BlockObjectResponse }) {
       );
     case "image":
       return <ImageBlock block={block} />;
+    case "video":
+      return <VideoBlock block={block} />;
     default:
       return <></>;
   }
