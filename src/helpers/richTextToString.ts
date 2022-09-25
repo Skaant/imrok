@@ -2,7 +2,7 @@ import { TextRichTextItemResponse } from "@notionhq/client/build/src/api-endpoin
 
 function richTextToString(texts: TextRichTextItemResponse[]): string {
   return texts
-    .map(({ annotations, plain_text }) => {
+    .map(({ plain_text }) => {
       return plain_text;
     })
     .join(" ");

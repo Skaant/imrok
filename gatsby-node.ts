@@ -8,6 +8,8 @@ import {
 import path from "path";
 import richTextToString from "./src/helpers/richTextToString";
 import { DefaultTemplateContext } from "./src/templates/default.template";
+import titlePropToString from "./src/helpers/titlePropToString";
+import { contentsState } from "./src/states/contents.state";
 
 // Initializing a client
 const notion = new Client({
@@ -17,10 +19,12 @@ const notion = new Client({
 export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   const { createPage } = actions;
 
-  const { results: pages } = await notion.databases.query({
-    database_id: process.env.DATABASE_ID as string,
-    filter: { property: "Contexte", select: { equals: "Page" } },
-  });
+  const pages = (
+    await notion.databases.query({
+      database_id: process.env.DATABASE_ID as string,
+      filter: { property: "Contexte", select: { equals: "Page" } },
+    })
+  ).results as PageObjectResponse[];
 
   const _pages = await Promise.all(
     (pages as PageObjectResponse[]).map(async (page) => {
@@ -28,6 +32,22 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
         block_id: page.id,
       });
       return { page, blocks };
+    })
+  );
+
+  contentsState.contents = (
+    await notion.databases.query({
+      database_id: process.env.DATABASE_ID as string,
+      filter: { property: "Contexte", select: { equals: "Contenu" } },
+    })
+  ).results as PageObjectResponse[];
+
+  const _contents = await Promise.all(
+    contentsState.contents.map(async (content) => {
+      const { results: blocks } = await notion.blocks.children.list({
+        block_id: content.id,
+      });
+      return { content, blocks };
     })
   );
 
@@ -41,27 +61,11 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
           ? richTextToString(url.rich_text as TextRichTextItemResponse[])
           : page.id,
       context: {
-        title:
-          name.type === "title" &&
-          (name.title[0] as TextRichTextItemResponse).text.content,
+        title: name.type === "title" && titlePropToString(name),
         blocks: blocks as BlockObjectResponse[],
       } as DefaultTemplateContext,
     });
   });
-
-  const { results: contents } = await notion.databases.query({
-    database_id: process.env.DATABASE_ID as string,
-    filter: { property: "Contexte", select: { equals: "Contenu" } },
-  });
-
-  const _contents = await Promise.all(
-    (contents as PageObjectResponse[]).map(async (content) => {
-      const { results: blocks } = await notion.blocks.children.list({
-        block_id: content.id,
-      });
-      return { content, blocks };
-    })
-  );
 
   _contents.forEach(({ content, blocks }) => {
     const { Name: name, Url: url, ["Créé le"]: date } = content.properties;
@@ -76,9 +80,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
           ? richTextToString(url.rich_text as TextRichTextItemResponse[])
           : content.id,
       context: {
-        title:
-          name.type === "title" &&
-          (name.title[0] as TextRichTextItemResponse).text.content,
+        title: name.type === "title" && titlePropToString(name),
         date: _date,
         blocks: blocks as BlockObjectResponse[],
       } as DefaultTemplateContext,
