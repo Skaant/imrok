@@ -62,6 +62,13 @@ h6 {
   font-family: $font-lemon;
 }
 
+.navbar {
+  background-color: $psik;
+}
+.navbar-brand {
+  font-family: $font-lemon;
+}
+
 #main.container {
   max-width: 800px;
   min-height: 100vh;

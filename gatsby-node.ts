@@ -7,8 +7,8 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import path from "path";
 import richTextToString from "./src/helpers/richTextToString";
-import { DefaultTemplateContext } from "./src/templates/default.template";
 import titlePropToString from "./src/helpers/titlePropToString";
+import { DefaultTemplateContext } from "statikon";
 
 // Initializing a client
 const notion = new Client({
