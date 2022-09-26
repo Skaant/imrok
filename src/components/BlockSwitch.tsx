@@ -5,6 +5,8 @@ import {
 import React from "react";
 import { SPECIAL_BLOCKS } from "../enums/special-blocks.enum";
 import { GlobalContext } from "../types/GlobalContext";
+import HeadingThreeBlock from "./blocks/HeadingThreeBlock";
+import HeadingTwoBlock from "./blocks/HeadingTwoBlock";
 import ImageBlock from "./blocks/ImageBlock";
 import ParagraphBlock from "./blocks/ParagraphBlock";
 import VideoBlock from "./blocks/VideoBlock";
@@ -41,6 +43,10 @@ export default function BlockSwitch({ block, contents }: BlockSwitchProps) {
       return <ImageBlock block={block} />;
     case "video":
       return <VideoBlock block={block} />;
+    case "heading_2":
+      return <HeadingTwoBlock block={block} />;
+    case "heading_3":
+      return <HeadingThreeBlock block={block} />;
     default:
       return <></>;
   }
