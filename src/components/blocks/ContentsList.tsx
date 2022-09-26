@@ -10,9 +10,13 @@ export default function ContentsList({ contents }: GlobalContext) {
       <div className="mt-4 mb-5">
         <>
           {contents.map((content) => {
-            const { ["Name"]: name, ["Url"]: url } = content.properties;
+            const {
+              ["Name"]: name,
+              ["Url"]: url,
+              ["Type de contenu"]: contentType,
+            } = content.properties;
             return (
-              <div>
+              <div key={content.id} className="mb-1">
                 <a
                   href={
                     url.type === "rich_text"
@@ -22,6 +26,11 @@ export default function ContentsList({ contents }: GlobalContext) {
                       : content.id
                   }
                 >
+                  {contentType.type === "select" && (
+                    <span className="badge rounded-pill bg-psik me-2">
+                      {contentType.select?.name}
+                    </span>
+                  )}
                   {name.type === "title" && titlePropToString(name)}
                 </a>
               </div>
