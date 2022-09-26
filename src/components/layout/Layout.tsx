@@ -38,7 +38,7 @@ function Layout({
         <script src="/script.js" defer={true}></script>
       </Helmet> */}
       <Navbar />
-      <div id="main" className="container px-0">
+      <div id="main" className="container px-0 pb-5">
         {children}
       </div>
       <Footer />

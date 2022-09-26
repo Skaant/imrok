@@ -25,7 +25,7 @@ function Footer() {
         <ul className="list-unstyled p-5 col-sm-12 col-md-6 col-xl-4">
           <li className="h3 py-2">{process.env.WEBSITE_TITLE}</li>
           <li className="py-2">
-            Site conçu par Romaric Ruga{" "}
+            Site développé par Romaric Ruga{" "}
             <a href="https://rimarok.com/">
               (freelance ingénierie web et éco-conception)
             </a>
