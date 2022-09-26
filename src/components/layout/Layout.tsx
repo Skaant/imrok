@@ -27,7 +27,7 @@ function Layout({
   children,
 }: LayoutProps) {
   return (
-    <>
+    <div className="bg-deep text-light">
       {/*
       <Helmet>
         <title>
@@ -42,7 +42,7 @@ function Layout({
         {children}
       </div>
       <Footer />
-    </>
+    </div>
   );
 }
 

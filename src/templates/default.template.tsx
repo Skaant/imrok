@@ -13,13 +13,11 @@ export type DefaultTemplateContext = {
   title: string;
   date: Date;
   blocks: BlockObjectResponse[];
-  contents: PageObjectResponse[];
 };
 
 const DefaultTemplate = ({
-  pageContext: { title, date, blocks, contents },
+  pageContext: { title, date, blocks },
 }: PageProps<undefined, DefaultTemplateContext>) => {
-  contentsState.contents = contents;
   return (
     <Layout>
       <>

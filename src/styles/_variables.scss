@@ -1,10 +1,21 @@
 // COLORS
 $deep: #433869;
 $psik: #a735ff;
-$gold: #ffcd5c;
+$highbs: #ffcd5c;
+// Bootstrap-based
+$light: #f8f9fa;
+// Bootstrap-based
+$dark: #212529;
 
 $theme-colors: (
   deep: $deep,
   psik: $psik,
-  gold: $gold,
+  highbs: $highbs,
+  light: $light,
+  dark: $dark,
 );
+
+$link-color: $highbs;
+
+$navbar-light-brand-color: $highbs;
+$navbar-light-brand-hover-color: $highbs;

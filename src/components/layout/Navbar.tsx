@@ -8,13 +8,13 @@ type NavbarProps = {
 function Navbar({ className }: NavbarProps) {
   return (
     <nav
-      className={`navbar navbar-expand-lg position-fixed w-100 bg-primary text-light${
+      className={`navbar navbar-expand-lg position-fixed w-100 bg-psik${
         className ? ` ${className}` : ""
       }`}
       style={{ zIndex: 1 }}
     >
       <div className="container-fluid d-flex align-items-center px-3">
-        <Link className="navbar-brand font-slab text-light" to="/">
+        <Link className="navbar-brand font-slab" to="/">
           {process.env.WEBSITE_TITLE}
         </Link>
         <button
@@ -41,7 +41,7 @@ function Navbar({ className }: NavbarProps) {
                 <li className="nav-item">
                   <Link
                     key={index}
-                    className={`nav-link text-light${"" /** @todo active */}`}
+                    className={`nav-link text-highbs${"" /** @todo active */}`}
                     to={path}
                   >
                     {title}
