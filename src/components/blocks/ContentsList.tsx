@@ -2,32 +2,33 @@ import { TextRichTextItemResponse } from "@notionhq/client/build/src/api-endpoin
 import React from "react";
 import richTextToString from "../../helpers/richTextToString";
 import titlePropToString from "../../helpers/titlePropToString";
-import { contentsState } from "../../states/contents.state";
+import { GlobalContext } from "../../types/GlobalContext";
 
-export default function ContentsList() {
-  const { contents } = contentsState;
+export default function ContentsList({ contents }: GlobalContext) {
   return (
-    <div className="mt-4 mb-5">
-      <>
-        {contents.map((content) => {
-          const { ["Name"]: name, ["Url"]: url } = content.properties;
-          return (
-            <div>
-              <a
-                href={
-                  url.type === "rich_text"
-                    ? richTextToString(
-                        url.rich_text as TextRichTextItemResponse[]
-                      )
-                    : content.id
-                }
-              >
-                {name.type === "title" && titlePropToString(name)}
-              </a>
-            </div>
-          );
-        })}
-      </>
-    </div>
+    contents && (
+      <div className="mt-4 mb-5">
+        <>
+          {contents.map((content) => {
+            const { ["Name"]: name, ["Url"]: url } = content.properties;
+            return (
+              <div>
+                <a
+                  href={
+                    url.type === "rich_text"
+                      ? richTextToString(
+                          url.rich_text as TextRichTextItemResponse[]
+                        )
+                      : content.id
+                  }
+                >
+                  {name.type === "title" && titlePropToString(name)}
+                </a>
+              </div>
+            );
+          })}
+        </>
+      </div>
+    )
   );
 }

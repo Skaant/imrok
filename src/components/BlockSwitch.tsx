@@ -4,14 +4,15 @@ import {
 } from "@notionhq/client/build/src/api-endpoints";
 import React from "react";
 import { SPECIAL_BLOCKS } from "../enums/special-blocks.enum";
+import { GlobalContext } from "../types/GlobalContext";
 import ImageBlock from "./blocks/ImageBlock";
 import ParagraphBlock from "./blocks/ParagraphBlock";
 import VideoBlock from "./blocks/VideoBlock";
 import SpecialBlockSwitch from "./SpecialBlockSwitch";
 
-export default function BlockSwitch({ block }: { block: BlockObjectResponse }) {
-  console.log(block.type);
+type BlockSwitchProps = GlobalContext & { block: BlockObjectResponse };
 
+export default function BlockSwitch({ block, contents }: BlockSwitchProps) {
   switch (block.type) {
     case "paragraph":
       if (
@@ -25,6 +26,7 @@ export default function BlockSwitch({ block }: { block: BlockObjectResponse }) {
                 .split("{")[1]
                 .split("}")[0] as SPECIAL_BLOCKS
             }
+            contents={contents}
           />
         );
       } else {

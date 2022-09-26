@@ -1,16 +1,18 @@
 import React from "react";
 import { SPECIAL_BLOCKS } from "../enums/special-blocks.enum";
+import { GlobalContext } from "../types/GlobalContext";
 import ContentsList from "./blocks/ContentsList";
+
+type SpecialBlockSwitchProps = GlobalContext & {
+  block: SPECIAL_BLOCKS;
+};
 
 export default function SpecialBlockSwitch({
   block,
-}: {
-  block: SPECIAL_BLOCKS;
-}) {
-  console.log(block);
+  contents,
+}: SpecialBlockSwitchProps) {
   switch (block) {
     case SPECIAL_BLOCKS.CONTENT_LIST:
-      console.log("ai");
-      return <ContentsList />;
+      return <ContentsList contents={contents} />;
   }
 }

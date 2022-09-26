@@ -1,22 +1,19 @@
-import {
-  BlockObjectResponse,
-  PageObjectResponse,
-} from "@notionhq/client/build/src/api-endpoints";
+import { BlockObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { PageProps } from "gatsby";
-import React, { createContext } from "react";
+import React from "react";
 import BlockSwitch from "../components/BlockSwitch";
 import Layout from "../components/layout/Layout";
-import { contentsState } from "../states/contents.state";
 import "../styles/global.scss";
+import { GlobalContext } from "../types/GlobalContext";
 
-export type DefaultTemplateContext = {
+export type DefaultTemplateContext = GlobalContext & {
   title: string;
   date: Date;
   blocks: BlockObjectResponse[];
 };
 
 const DefaultTemplate = ({
-  pageContext: { title, date, blocks },
+  pageContext: { title, date, blocks, contents },
 }: PageProps<undefined, DefaultTemplateContext>) => {
   return (
     <Layout>
@@ -30,7 +27,7 @@ const DefaultTemplate = ({
           </p>
         )}
         {blocks.map((block) => (
-          <BlockSwitch block={block} />
+          <BlockSwitch block={block} contents={contents} />
         ))}
       </>
     </Layout>

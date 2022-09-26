@@ -1,5 +1,5 @@
 import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 
-export const contentsState: {
+export type GlobalContext = {
   contents: PageObjectResponse[];
-} = { contents: [] };
+};

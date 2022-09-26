@@ -9,7 +9,6 @@ import path from "path";
 import richTextToString from "./src/helpers/richTextToString";
 import { DefaultTemplateContext } from "./src/templates/default.template";
 import titlePropToString from "./src/helpers/titlePropToString";
-import { contentsState } from "./src/states/contents.state";
 
 // Initializing a client
 const notion = new Client({
@@ -35,7 +34,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     })
   );
 
-  contentsState.contents = (
+  const contents = (
     await notion.databases.query({
       database_id: process.env.DATABASE_ID as string,
       filter: { property: "Contexte", select: { equals: "Contenu" } },
@@ -43,7 +42,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   ).results as PageObjectResponse[];
 
   const _contents = await Promise.all(
-    contentsState.contents.map(async (content) => {
+    contents.map(async (content) => {
       const { results: blocks } = await notion.blocks.children.list({
         block_id: content.id,
       });
@@ -63,6 +62,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       context: {
         title: name.type === "title" && titlePropToString(name),
         blocks: blocks as BlockObjectResponse[],
+        contents,
       } as DefaultTemplateContext,
     });
   });
