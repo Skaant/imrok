@@ -10,11 +10,15 @@ function RichTextRenderer({
     <>
       {richTexts.map(({ annotations, plain_text, href }) => {
         if (annotations.bold) {
-          return <b>{plain_text}</b>;
+          return <b key={plain_text}>{plain_text}</b>;
         } else if (annotations.italic) {
-          return <i>{plain_text}</i>;
+          return <i key={plain_text}>{plain_text}</i>;
         } else if (href) {
-          return <a href={href}>{plain_text}</a>;
+          return (
+            <a key={plain_text} href={href}>
+              {plain_text}
+            </a>
+          );
         }
         return plain_text;
       })}

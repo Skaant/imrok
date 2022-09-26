@@ -27,7 +27,7 @@ const DefaultTemplate = ({
           </p>
         )}
         {blocks.map((block) => (
-          <BlockSwitch block={block} contents={contents} />
+          <BlockSwitch key={block.id} block={block} contents={contents} />
         ))}
       </>
     </Layout>
