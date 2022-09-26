@@ -10,12 +10,13 @@ export default function ImageBlock({
 }: {
   block: ImageBlockObjectResponse;
 }) {
+  const className = "mt-5 mb-4";
   return (
     <>
       {block.image.type === "external" ? (
-        <img src={block.image.external.url} />
+        <img src={block.image.external.url} className={className} />
       ) : (
-        <img src={block.image.file.url} />
+        <img src={block.image.file.url} className={className} />
       )}
       {block.image.caption && (
         <p className="small">
