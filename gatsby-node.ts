@@ -9,6 +9,7 @@ import path from "path";
 import richTextToString from "./src/helpers/richTextToString";
 import titlePropToString from "./src/helpers/titlePropToString";
 import { DefaultTemplateContext } from "statikon";
+import datePropToDate from "./src/helpers/datePropToDate";
 
 // Initializing a client
 const notion = new Client({
@@ -50,6 +51,30 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     })
   );
 
+  const sharedProps: Pick<DefaultTemplateContext, "navbar" | "contents"> = {
+    navbar: {
+      links: [
+        {
+          title: "Accueil",
+          path: "/",
+        },
+        {
+          title: "Pensées",
+          path: "/pensees",
+        },
+        {
+          title: "Illustrations",
+          path: "/illustrations",
+        },
+        {
+          title: "Vidéos",
+          path: "/videos",
+        },
+      ],
+    },
+    contents,
+  };
+
   _pages.forEach(({ page, blocks }) => {
     const { Name: name, Url: url } = page.properties;
 
@@ -62,17 +87,19 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       context: {
         title: name.type === "title" && titlePropToString(name),
         blocks: blocks as BlockObjectResponse[],
-        contents,
+        ...sharedProps,
       } as DefaultTemplateContext,
     });
   });
 
   _contents.forEach(({ content, blocks }) => {
-    const { Name: name, Url: url, ["Créé le"]: date } = content.properties;
-    let _date;
-    if (date.type === "date" && date.date) {
-      _date = new Date(date.date.start);
-    }
+    const {
+      Name: name,
+      Url: url,
+      ["Créé le"]: createdAt,
+      ["Publié le"]: publishedAt,
+      ["Édité le"]: editedAt,
+    } = content.properties;
     createPage({
       component: path.resolve("./src/templates/default.template.tsx"),
       path:
@@ -81,7 +108,9 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
           : content.id,
       context: {
         title: name.type === "title" && titlePropToString(name),
-        date: _date,
+        createdAt: createdAt.type === "date" && datePropToDate(createdAt),
+        publishedAt: publishedAt.type === "date" && datePropToDate(publishedAt),
+        editedAt: editedAt.type === "date" && datePropToDate(editedAt),
         blocks: blocks as BlockObjectResponse[],
       } as DefaultTemplateContext,
     });
