@@ -51,8 +51,28 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     })
   );
 
-  const sharedProps: Pick<DefaultTemplateContext, "navbar" | "contents"> = {
+  const sharedProps: Pick<
+    DefaultTemplateContext,
+    "navbar" | "contents" | "footer"
+  > = {
     navbar: {
+      links: [
+        {
+          title: "Pensées",
+          path: "/pensees",
+        },
+        {
+          title: "Illustrations",
+          path: "/illustrations",
+        },
+        {
+          title: "Vidéos",
+          path: "/videos",
+        },
+      ],
+    },
+    contents,
+    footer: {
       links: [
         {
           title: "Accueil",
@@ -72,7 +92,6 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
         },
       ],
     },
-    contents,
   };
 
   _pages.forEach(({ page, blocks }) => {
@@ -112,6 +131,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
         publishedAt: publishedAt.type === "date" && datePropToDate(publishedAt),
         editedAt: editedAt.type === "date" && datePropToDate(editedAt),
         blocks: blocks as BlockObjectResponse[],
+        ...sharedProps,
       } as DefaultTemplateContext,
     });
   });
