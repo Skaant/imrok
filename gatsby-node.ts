@@ -10,11 +10,22 @@ import richTextToString from "./src/helpers/richTextToString";
 import titlePropToString from "./src/helpers/titlePropToString";
 import { DefaultTemplateContext } from "statikon";
 import datePropToDate from "./src/helpers/datePropToDate";
+import imageCache from "./src/helpers/imageCache";
 
 // Initializing a client
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
 });
+
+export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
+  actions,
+}) => {
+  actions.setWebpackConfig({
+    node: {
+      fs: "empty",
+    },
+  });
+};
 
 export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   const { createPage } = actions;
@@ -30,6 +41,14 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     (pages as PageObjectResponse[]).map(async (page) => {
       const { results: blocks } = await notion.blocks.children.list({
         block_id: page.id,
+      });
+      (blocks as BlockObjectResponse[]).map(async (block) => {
+        if (block.type === "image" && block.image.type === "file") {
+          const filename = await imageCache(block.image.file.url);
+          if (filename) {
+            block.image.file.url = `https://imrok.fr/_medias/${filename}`;
+          }
+        }
       });
       return { page, blocks };
     })
