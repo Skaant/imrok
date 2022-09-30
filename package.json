@@ -1,6 +1,6 @@
 {
   "name": "imrok-notion",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "imrok-notion",
   "author": "Rimarok",
@@ -8,9 +8,9 @@
     "gatsby"
   ],
   "scripts": {
-    "develop": "gatsby develop",
     "start": "gatsby develop",
     "build": "gatsby build",
+    "build:medias": "cp -r ./src/static/medias ./build/static",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "typecheck": "tsc --noEmit"
@@ -24,8 +24,7 @@
     "node-fetch": "^2.6.7",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "sass": "^1.54.9",
-    "statikon": "^0.1.1"
+    "sass": "^1.54.9"
   },
   "devDependencies": {
     "@types/download": "^8.0.1",

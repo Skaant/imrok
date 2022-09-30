@@ -10,7 +10,7 @@ import richTextToString from "./src/helpers/richTextToString";
 import titlePropToString from "./src/helpers/titlePropToString";
 import { DefaultTemplateContext } from "statikon";
 import datePropToDate from "./src/helpers/datePropToDate";
-import imageCache from "./src/helpers/imageCache";
+import cacheBlocksImages from "./src/helpers/cacheBlocksImages";
 
 // Initializing a client
 const notion = new Client({
@@ -42,14 +42,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       const { results: blocks } = await notion.blocks.children.list({
         block_id: page.id,
       });
-      (blocks as BlockObjectResponse[]).map(async (block) => {
-        if (block.type === "image" && block.image.type === "file") {
-          const filename = await imageCache(block.image.file.url);
-          if (filename) {
-            block.image.file.url = `https://imrok.fr/_medias/${filename}`;
-          }
-        }
-      });
+      cacheBlocksImages(blocks as BlockObjectResponse[]);
       return { page, blocks };
     })
   );
@@ -66,6 +59,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       const { results: blocks } = await notion.blocks.children.list({
         block_id: content.id,
       });
+      cacheBlocksImages(blocks as BlockObjectResponse[]);
       return { content, blocks };
     })
   );
