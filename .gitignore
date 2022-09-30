@@ -3,4 +3,5 @@ node_modules/
 public
 src/gatsby-types.d.ts
 .env.*
-src/static/medias
+src/static/medias/*
+!src/static/medias/placeholder.md
