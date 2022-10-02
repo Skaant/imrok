@@ -10,7 +10,7 @@
   "scripts": {
     "start": "gatsby develop",
     "build": "gatsby build",
-    "build:medias": "cp -r ./src/static/medias ./build/static",
+    "build:medias": "cp -r ./src/static/medias ./public/static",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "typecheck": "tsc --noEmit"
