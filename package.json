@@ -3,8 +3,12 @@
   "version": "1.1.0",
   "private": true,
   "description": "imrok-notion",
-  "author": "Rimarok",
+  "author": "RIMAROK.com",
   "keywords": [
+    "creative",
+    "blog",
+    "static",
+    "jamstack",
     "gatsby"
   ],
   "scripts": {

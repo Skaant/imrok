@@ -11,6 +11,7 @@ import titlePropToString from "./src/helpers/titlePropToString";
 import { DefaultTemplateContext } from "statikon";
 import datePropToDate from "./src/helpers/datePropToDate";
 import cacheBlocksImages from "./src/helpers/cacheBlocksImages";
+import provisionContent from "./src/helpers/provisionContent";
 
 // Initializing a client
 const notion = new Client({
@@ -38,13 +39,9 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   ).results as PageObjectResponse[];
 
   const _pages = await Promise.all(
-    (pages as PageObjectResponse[]).map(async (page) => {
-      const { results: blocks } = await notion.blocks.children.list({
-        block_id: page.id,
-      });
-      cacheBlocksImages(blocks as BlockObjectResponse[]);
-      return { page, blocks };
-    })
+    (pages as PageObjectResponse[]).map((page) =>
+      provisionContent(page, notion)
+    )
   );
 
   const contents = (
@@ -55,13 +52,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   ).results as PageObjectResponse[];
 
   const _contents = await Promise.all(
-    contents.map(async (content) => {
-      const { results: blocks } = await notion.blocks.children.list({
-        block_id: content.id,
-      });
-      cacheBlocksImages(blocks as BlockObjectResponse[]);
-      return { content, blocks };
-    })
+    contents.map((page) => provisionContent(page, notion))
   );
 
   const sharedProps: Pick<
@@ -124,7 +115,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     });
   });
 
-  _contents.forEach(({ content, blocks }) => {
+  _contents.forEach(({ page: content, blocks }) => {
     const {
       Name: name,
       Url: url,
