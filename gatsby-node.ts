@@ -10,7 +10,6 @@ import richTextToString from "./src/helpers/richTextToString";
 import titlePropToString from "./src/helpers/titlePropToString";
 import { DefaultTemplateContext } from "statikon";
 import datePropToDate from "./src/helpers/datePropToDate";
-import cacheBlocksImages from "./src/helpers/cacheBlocksImages";
 import provisionContent from "./src/helpers/provisionContent";
 
 // Initializing a client
@@ -31,6 +30,10 @@ export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
 export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   const { createPage } = actions;
 
+  /*
+   * 1. PAGE [& CONTENTS] RETRIEVING
+   */
+
   const pages = (
     await notion.databases.query({
       database_id: process.env.DATABASE_ID as string,
@@ -39,10 +42,10 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   ).results as PageObjectResponse[];
 
   const _pages = await Promise.all(
-    (pages as PageObjectResponse[]).map((page) =>
-      provisionContent(page, notion)
-    )
+    pages.map((page) => provisionContent(page, notion))
   );
+
+  /** These instructions shouldn't be activated for basic website. */
 
   const contents = (
     await notion.databases.query({
@@ -54,6 +57,10 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   const _contents = await Promise.all(
     contents.map((page) => provisionContent(page, notion))
   );
+
+  /*
+   * 2. RENDERING SHARED PROPS
+   */
 
   const sharedProps: Pick<
     DefaultTemplateContext,
@@ -97,6 +104,10 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       ],
     },
   };
+
+  /*
+   * 3. PAGE [& CONTENTS] RENDERING
+   */
 
   _pages.forEach(({ page, blocks }) => {
     const { Name: name, Url: url } = page.properties;
