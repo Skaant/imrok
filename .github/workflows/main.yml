@@ -22,8 +22,8 @@ jobs:
 
       - run: touch .env.production
       - run: echo "WEBSITE_TITLE=IMROK.fr" > .env.production
-      - run: echo "NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}" > .env.production
-      - run: echo "DATABASE_ID=${{ secrets.DATABASE_ID }}" > .env.production
+      - run: echo "NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}" >> .env.production
+      - run: echo "DATABASE_ID=${{ secrets.DATABASE_ID }}" >> .env.production
 
       - run: npm i
       - run: npm run build
