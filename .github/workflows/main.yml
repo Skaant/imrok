@@ -1,0 +1,39 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI
+
+on:
+  push:
+    branches: ["dev"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+          cache: "npm"
+
+      - run: touch .env.production
+      - run: echo "WEBSITE_TITLE=IMROK.fr" > .env.production
+      - run: echo "NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}" > .env.production
+      - run: echo "DATABASE_ID=${{ secrets.DATABASE_ID }}" > .env.production
+
+      - run: npm i
+      - run: npm run build
+      - run: npm run build:medias
+
+      - name: FTP dev environment
+        uses: sebastianpopp/ftp-action@releases/v2
+        with:
+          host: ${{ secrets.FTP_SERVER }}
+          user: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          localDir: ./public
+          remoteDir: ${{ secrets.FTP_PROD_DIR }}
