@@ -4,6 +4,7 @@ import {
   PageObjectResponse,
 } from "@notionhq/client/build/src/api-endpoints";
 import cacheBlocksImages from "./cacheBlocksImages";
+import chainingSpecialBlocks from "./chainingSpecialBlocks";
 
 export default async function provisionContent(
   page: PageObjectResponse,
@@ -19,5 +20,5 @@ export default async function provisionContent(
     blocks.push(...(res.results as BlockObjectResponse[]));
   } while (res.has_more);
   cacheBlocksImages(blocks);
-  return { page, blocks };
+  return { page, blocks: await chainingSpecialBlocks(blocks) };
 }

@@ -1,7 +1,6 @@
 import type { GatsbyNode } from "gatsby";
 import { Client } from "@notionhq/client";
 import {
-  BlockObjectResponse,
   PageObjectResponse,
   TextRichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
@@ -120,7 +119,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
           : page.id,
       context: {
         title: name.type === "title" && titlePropToString(name),
-        blocks: blocks as BlockObjectResponse[],
+        blocks,
         ...sharedProps,
       } as DefaultTemplateContext,
     });
@@ -145,7 +144,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
         createdAt: createdAt.type === "date" && datePropToDate(createdAt),
         publishedAt: publishedAt.type === "date" && datePropToDate(publishedAt),
         editedAt: editedAt.type === "date" && datePropToDate(editedAt),
-        blocks: blocks as BlockObjectResponse[],
+        blocks,
         ...sharedProps,
       } as DefaultTemplateContext,
     });
