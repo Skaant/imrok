@@ -10,6 +10,7 @@ import titlePropToString from "./src/helpers/titlePropToString";
 import { DefaultTemplateContext } from "statikon";
 import datePropToDate from "./src/helpers/datePropToDate";
 import provisionContent from "./src/helpers/provisionContent";
+import { COLORS } from "./src/enums/colors.enum";
 
 // Initializing a client
 const notion = new Client({
@@ -63,9 +64,13 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
 
   const sharedProps: Pick<
     DefaultTemplateContext,
-    "navbar" | "contents" | "footer"
+    "bg" | "text" | "navbar" | "contents" | "footer"
   > = {
+    bg: COLORS.DEEP,
+    text: COLORS.LIGHT,
     navbar: {
+      bg: COLORS.PSIK,
+      text: COLORS.GOLD,
       links: [
         {
           title: "Pensées",
@@ -83,6 +88,9 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     },
     contents,
     footer: {
+      bg: COLORS.PSIK,
+      text: COLORS.LIGHT,
+      a: COLORS.GOLD,
       links: [
         {
           title: "Accueil",
