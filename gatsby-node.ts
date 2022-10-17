@@ -109,6 +109,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
           path: "/videos",
         },
       ],
+      contact: true,
     },
   };
 
