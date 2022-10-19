@@ -27,6 +27,7 @@ jobs:
 
       - run: npm i
       - run: npm run build
+      - run: npm run build:client
       - run: npm run build:medias
 
       - name: FTP dev environment
