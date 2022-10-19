@@ -118,7 +118,12 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
    */
 
   _pages.forEach(({ page, blocks }) => {
-    const { Name: name, Url: url } = page.properties;
+    const {
+      Name: name,
+      Url: url,
+      Description: description,
+      Robots: robots,
+    } = page.properties;
 
     createPage({
       component: path.resolve("./src/templates/default.template.tsx"),
@@ -129,6 +134,14 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       context: {
         title: name.type === "title" && titlePropToString(name),
         blocks,
+        head: {
+          description:
+            description.type === "rich_text" &&
+            richTextToString(
+              description.rich_text as TextRichTextItemResponse[]
+            ),
+          noIndex: robots.type === "select" && robots.select?.name === "Masqué",
+        },
         ...sharedProps,
       } as DefaultTemplateContext,
     });
@@ -138,6 +151,8 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     const {
       Name: name,
       Url: url,
+      Description: description,
+      Robots: robots,
       ["Créé le"]: createdAt,
       ["Publié le"]: publishedAt,
       ["Édité le"]: editedAt,
@@ -150,6 +165,14 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
           : content.id,
       context: {
         title: name.type === "title" && titlePropToString(name),
+        head: {
+          description:
+            description.type === "rich_text" &&
+            richTextToString(
+              description.rich_text as TextRichTextItemResponse[]
+            ),
+          noIndex: robots.type === "select" && robots.select?.name === "Masqué",
+        },
         createdAt: createdAt.type === "date" && datePropToDate(createdAt),
         publishedAt: publishedAt.type === "date" && datePropToDate(publishedAt),
         editedAt: editedAt.type === "date" && datePropToDate(editedAt),
