@@ -31,7 +31,7 @@
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "sass": "^1.54.9",
-    "statikon": "^0.1.8"
+    "statikon": "file:../statikon"
   },
   "devDependencies": {
     "@types/download": "^8.0.1",
