@@ -42,10 +42,6 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     { filter: { property: "Contexte", select: { equals: "Page" } } }
   );
 
-  const _pages = await Promise.all(
-    pages.map((page) => provisionContent(page, notion))
-  );
-
   /** These instructions shouldn't be activated for basic website. */
 
   const contents = (
@@ -55,6 +51,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     })
   ).results as PageObjectResponse[];
 
+  /** @todo Remove when getDatabaseContent will be integrated */
   const _contents = await Promise.all(
     contents.map((page) => provisionContent(page, notion))
   );
@@ -118,7 +115,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
    * 3. PAGE [& CONTENTS] RENDERING
    */
 
-  _pages.forEach(({ page, blocks }) => {
+  pages.forEach(({ blocks, ...page }) => {
     const {
       Name: name,
       Url: url,
@@ -148,6 +145,11 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     });
   });
 
+  /**
+   * @todo Use `contents` & change `forEach` signature for
+   *  `({ blocks, ...page: content })`
+   *  (see below for `pages.forEach` example).
+   */
   _contents.forEach(({ page: content, blocks }) => {
     const {
       Name: name,
