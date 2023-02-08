@@ -11,6 +11,7 @@ import { DefaultTemplateContext } from "statikon";
 import datePropToDate from "./src/helpers/datePropToDate";
 import provisionContent from "./src/helpers/provisionContent";
 import { COLORS } from "./src/enums/colors.enum";
+import getDatabaseContent from "./src/nebula-genesis/getDatabaseContent";
 
 // Initializing a client
 const notion = new Client({
@@ -34,12 +35,12 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
    * 1. PAGE [& CONTENTS] RETRIEVING
    */
 
-  const pages = (
-    await notion.databases.query({
-      database_id: process.env.DATABASE_ID as string,
-      filter: { property: "Contexte", select: { equals: "Page" } },
-    })
-  ).results as PageObjectResponse[];
+  const pages = await getDatabaseContent(
+    notion,
+    process.env.DATABASE_ID as string,
+    "https://imrok.fr",
+    { filter: { property: "Contexte", select: { equals: "Page" } } }
+  );
 
   const _pages = await Promise.all(
     pages.map((page) => provisionContent(page, notion))
