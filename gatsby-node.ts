@@ -137,6 +137,14 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   });
 
   contents.forEach(({ blocks, ...page }) => {
+    console.log(
+      blocks
+        .filter((block) => block.type == "resized_image")
+        .map((block) => {
+          return block.type;
+        })
+    );
+
     const {
       Name: name,
       Url: url,
