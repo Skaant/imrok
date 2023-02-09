@@ -44,12 +44,12 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
 
   /** These instructions shouldn't be activated for basic website. */
 
-  const contents = (
-    await notion.databases.query({
-      database_id: process.env.DATABASE_ID as string,
-      filter: { property: "Contexte", select: { equals: "Contenu" } },
-    })
-  ).results as PageObjectResponse[];
+  const contents = await getDatabaseContent(
+    notion,
+    process.env.DATABASE_ID as string,
+    "https://imrok.fr",
+    { filter: { property: "Contexte", select: { equals: "Contenu" } } }
+  );
 
   /** @todo Remove when getDatabaseContent will be integrated */
   const _contents = await Promise.all(
