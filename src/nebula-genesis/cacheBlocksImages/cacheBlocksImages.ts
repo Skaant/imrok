@@ -20,7 +20,15 @@ export default async function cacheBlocksImages(
             block = {
               id: block.id,
               type: "resized_image",
-              minUrl: `/static/medias/${filename}`,
+              standardUrl: `/static/medias/${filename}`,
+              minUrl: `src/static/medias/${filename.replace(
+                /(\.[\w\d_-]+)$/i,
+                "--min$1"
+              )}`,
+              medUrl: `src/static/medias/${filename.replace(
+                /(\.[\w\d_-]+)$/i,
+                "--med$1"
+              )}`,
             } as ResizedImageBlockObject;
           }
         }
