@@ -21,12 +21,15 @@ export default async function getDatabaseContent(
 
   const _pages = await Promise.all(
     pages.map(async (page) => {
-      const blocks = await getPageBlocks(notionClient, page.id);
-      await cacheBlocksImages(blocks, siteUrl);
-      const _blocks = abstractBlocks(blocks);
+      let blocks = (await getPageBlocks(
+        notionClient,
+        page.id
+      )) as ExtendedBlockObjectResponse[];
+      blocks = await cacheBlocksImages(blocks, siteUrl);
+      blocks = abstractBlocks(blocks);
       return {
         ...page,
-        blocks: _blocks,
+        blocks,
       };
     })
   );

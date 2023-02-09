@@ -11,13 +11,9 @@ export default async function cacheImage(imageUrl: string, siteUrl: string) {
     } catch (err) {
       const res = await fetch(`${siteUrl}/static/medias/${filename}`);
       if (res.status === 404) {
-        console.log(filename);
         const res = await fetch(imageUrl);
-        console.log("res");
         const buffer = await res.buffer();
-        console.log("buffer");
         await writeFile(filepath, buffer);
-        console.log("writefile");
 
         const metadata = await sharp(filepath).metadata();
 

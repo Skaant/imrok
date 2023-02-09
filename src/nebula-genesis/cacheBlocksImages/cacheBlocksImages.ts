@@ -5,7 +5,7 @@ export default async function cacheBlocksImages(
   blocks: ExtendedBlockObjectResponse[],
   siteUrl: string
 ) {
-  await Promise.all(
+  return await Promise.all(
     blocks
       .filter((block) => block.type === "image" && block.image.type === "file")
       .map(async (block) => {
@@ -32,6 +32,7 @@ export default async function cacheBlocksImages(
             } as ResizedImageBlockObject;
           }
         }
+        return block;
       })
   );
 }
