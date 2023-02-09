@@ -1,15 +1,11 @@
 import type { GatsbyNode } from "gatsby";
 import { Client } from "@notionhq/client";
-import {
-  PageObjectResponse,
-  TextRichTextItemResponse,
-} from "@notionhq/client/build/src/api-endpoints";
+import { TextRichTextItemResponse } from "@notionhq/client/build/src/api-endpoints";
 import path from "path";
 import richTextToString from "./src/helpers/richTextToString";
 import titlePropToString from "./src/helpers/titlePropToString";
 import { DefaultTemplateContext } from "statikon";
 import datePropToDate from "./src/helpers/datePropToDate";
-import provisionContent from "./src/helpers/provisionContent";
 import { COLORS } from "./src/enums/colors.enum";
 import getDatabaseContent from "./src/nebula-genesis/getDatabaseContent";
 
@@ -49,11 +45,6 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     process.env.DATABASE_ID as string,
     "https://imrok.fr",
     { filter: { property: "Contexte", select: { equals: "Contenu" } } }
-  );
-
-  /** @todo Remove when getDatabaseContent will be integrated */
-  const _contents = await Promise.all(
-    contents.map((page) => provisionContent(page, notion))
   );
 
   /*
@@ -145,12 +136,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     });
   });
 
-  /**
-   * @todo Use `contents` & change `forEach` signature for
-   *  `({ blocks, ...page: content })`
-   *  (see below for `pages.forEach` example).
-   */
-  _contents.forEach(({ page: content, blocks }) => {
+  contents.forEach(({ blocks, ...page }) => {
     const {
       Name: name,
       Url: url,
@@ -159,13 +145,13 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       ["Créé le"]: createdAt,
       ["Publié le"]: publishedAt,
       ["Édité le"]: editedAt,
-    } = content.properties;
+    } = page.properties;
     createPage({
       component: path.resolve("./src/templates/default.template.tsx"),
       path:
         url.type === "rich_text"
           ? richTextToString(url.rich_text as TextRichTextItemResponse[])
-          : content.id,
+          : page.id,
       context: {
         title: name.type === "title" && titlePropToString(name),
         head: {
