@@ -16,7 +16,7 @@ export default async function cacheBlocksImages(
           ? (block = {
               id: block.id,
               type: "resized_image",
-              standardUrl: filepaths.filepath,
+              standardUrl: filepaths.filepath.replace("src", ""),
             } as ResizedImageBlockObject)
           : filepaths?.filepath &&
             filepaths.minFilepath &&
@@ -24,7 +24,7 @@ export default async function cacheBlocksImages(
           ? (block = {
               id: block.id,
               type: "resized_image",
-              standardUrl: filepaths.filepath,
+              standardUrl: filepaths.filepath.replace("src", ""),
               minUrl: filepaths.minFilepath,
             } as ResizedImageBlockObject)
           : filepaths?.filepath &&
@@ -33,7 +33,7 @@ export default async function cacheBlocksImages(
           ? (block = {
               id: block.id,
               type: "resized_image",
-              standardUrl: filepaths.filepath,
+              standardUrl: filepaths.filepath.replace("src", ""),
               minUrl: filepaths.minFilepath,
               medUrl: filepaths.medFilepath,
             } as ResizedImageBlockObject)
