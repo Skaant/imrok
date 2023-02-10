@@ -9,35 +9,17 @@ export default async function cacheBlocksImages(
     blocks.map(async (block) => {
       /* Redudant block type checking for TS typing */
       if (block.type === "image" && block.image.type === "file") {
-        const filepaths = await cacheImage(block.image.file.url, siteUrl);
-        console.log(filepaths);
+        const urls = await cacheImage(block.image.file.url, siteUrl);
 
-        filepaths?.filepath && !filepaths.minFilepath && !filepaths.medFilepath
-          ? (block = {
-              id: block.id,
-              type: "resized_image",
-              standardUrl: filepaths.filepath.replace("src", ""),
-            } as ResizedImageBlockObject)
-          : filepaths?.filepath &&
-            filepaths.minFilepath &&
-            !filepaths.medFilepath
-          ? (block = {
-              id: block.id,
-              type: "resized_image",
-              standardUrl: filepaths.filepath.replace("src", ""),
-              minUrl: filepaths.minFilepath,
-            } as ResizedImageBlockObject)
-          : filepaths?.filepath &&
-            filepaths.minFilepath &&
-            filepaths.medFilepath
-          ? (block = {
-              id: block.id,
-              type: "resized_image",
-              standardUrl: filepaths.filepath.replace("src", ""),
-              minUrl: filepaths.minFilepath,
-              medUrl: filepaths.medFilepath,
-            } as ResizedImageBlockObject)
-          : "";
+        if (typeof urls === "object") {
+          block = {
+            id: block.id,
+            type: "resized_image",
+            ...urls,
+          };
+        } else if (typeof urls === "string") {
+          block.image.file.url = urls;
+        }
       }
       return block;
     })
