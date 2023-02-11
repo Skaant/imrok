@@ -2,6 +2,7 @@ import { stat, writeFile } from "fs/promises";
 import fetch from "node-fetch";
 import { MultisizedImage } from "statikon";
 const sharp = require("sharp");
+const probe = require("probe-image-size");
 
 export default async function cacheImage(
   imageUrl: string,
@@ -9,6 +10,8 @@ export default async function cacheImage(
 ): Promise<MultisizedImage | string | undefined> {
   const filename = imageUrl.split("?")[0].split("/").pop() || "";
   if (filename) {
+    let result = await probe(imageUrl);
+    console.log(result.width);
     const filepath = `src/static/medias/${filename}`;
     try {
       await stat(filepath);
