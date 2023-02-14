@@ -1,8 +1,8 @@
 import { stat, writeFile } from "fs/promises";
 import fetch from "node-fetch";
 import { MultisizedImage } from "statikon";
-const sharp = require("sharp");
-const probe = require("probe-image-size");
+import sharp from "sharp";
+import probe from "probe-image-size";
 
 export default async function cacheImage(
   imageUrl: string,
@@ -10,53 +10,55 @@ export default async function cacheImage(
 ): Promise<MultisizedImage | string | undefined> {
   const filename = imageUrl.split("?")[0].split("/").pop() || "";
   if (filename) {
-    let result = await probe(imageUrl);
-    console.log(result.width);
     const filepath = `src/static/medias/${filename}`;
     try {
       await stat(filepath);
     } catch (err) {
+      let result = await probe(imageUrl);
       const res = await fetch(`${siteUrl}/static/medias/${filename}`);
 
-      if (res.status === 404) {
+      let urls: MultisizedImage = {
+        standardUrl: `/static/medias/${filename}`,
+      };
+
+      if (
+        res.status === 404 ||
+        (result.width >= 360 && !urls.minUrl && !urls.medUrl)
+      ) {
         const res = await fetch(imageUrl);
         const buffer = await res.buffer();
         await writeFile(filepath, buffer);
 
-        let urls: MultisizedImage = {
-          standardUrl: `/static/medias/${filename}`,
-        };
-        const metadata = await sharp(filepath).metadata();
+        urls.minUrl = `/static/medias/${filename.replace(
+          /(\.[\w\d_-]+)$/i,
+          "--min$1"
+        )}`;
 
-        if (metadata.width && metadata.width >= 360) {
-          urls.minUrl = `/static/medias/${filename.replace(
+        if (result.width <= 800) {
+          await sharp(filepath)
+            .rotate()
+            .resize({
+              width: 360,
+              fit: "inside",
+            })
+            .toFile("src" + urls.minUrl);
+        } else {
+          urls.medUrl = `/static/medias/${filename.replace(
             /(\.[\w\d_-]+)$/i,
-            "--min$1"
+            "--med$1"
           )}`;
-
-          if (metadata.width <= 800) {
-            await sharp(filepath)
-              .rotate()
-              .resize(360)
-              .toFile("src" + urls.minUrl);
-          } else {
-            urls.medUrl = `/static/medias/${filename.replace(
-              /(\.[\w\d_-]+)$/i,
-              "--med$1"
-            )}`;
-            await Promise.all(
-              [{ width: 800 }, { width: 360 }].map((size) => {
-                return sharp(filepath)
-                  .rotate()
-                  .resize(size.width, size.width)
-                  .toFile(
-                    size.width === 360
-                      ? "src" + urls.minUrl
-                      : "src" + urls.medUrl
-                  );
-              })
-            );
-          }
+          await Promise.all(
+            [{ width: 800 }, { width: 360 }].map((size) => {
+              return sharp(filepath)
+                .rotate()
+                .resize(size.width, size.width, {
+                  fit: "inside",
+                })
+                .toFile(
+                  size.width === 360 ? "src" + urls.minUrl : "src" + urls.medUrl
+                );
+            })
+          );
         }
 
         return urls;
