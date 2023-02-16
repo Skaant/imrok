@@ -53,8 +53,9 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
 
   const sharedProps: Pick<
     DefaultTemplateContext,
-    "bg" | "text" | "navbar" | "contents" | "footer"
+    "bg" | "text" | "navbar" | "contents" | "footer" | "activatedTiers"
   > = {
+    activatedTiers: ["Youtube", "Soundcloud"],
     bg: COLORS.DEEP,
     text: COLORS.LIGHT,
     navbar: {
