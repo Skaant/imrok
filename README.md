@@ -1,12 +1,5 @@
 # imrok-notion
 
-This project is a contextualized POC for **Gatsby x Notion** integration.
-
-Its two main purposes are :
-
-- Building the new [IMROK.fr](imrok.fr) wesbite,
-- Creating base logic & components for a gatsby-notion module abstration.
-
 ## Getting started
 
 ### Environment variables
@@ -24,3 +17,11 @@ DATABASE_ID=
 ```sh
 npm start
 ```
+
+## Troubleshooting
+
+### Unable to connect (gstatic)
+
+VPN can block first `gstatic.com` content load, and result in an "Unable to connect" error on `localhost:8000`.
+
+_Gstatic dependencies should be investigated._
