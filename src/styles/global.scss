@@ -31,9 +31,6 @@
 // 7. Optionally include utilities API last to generate classes based on the Sass map in `_utilities.scss`
 @import "../../node_modules/bootstrap/scss/utilities/api";
 
-// 8. Add additional custom code here
-@import "../../node_modules/statikon/src/styles/statikon.scss";
-
 @font-face {
   font-family: $font-lemon;
   src: url("../static/fonts/Lemon-Regular.ttf");
@@ -54,6 +51,8 @@
 
 body {
   font-family: $font-open;
+  background-color: $deep;
+  color: $light;
 }
 
 h1,
@@ -68,8 +67,13 @@ h6 {
 .navbar {
   background-color: $psik;
 }
+
 .navbar-brand {
   font-family: $font-lemon;
+}
+
+footer {
+  background-color: $psik;
 }
 
 #main.container {

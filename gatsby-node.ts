@@ -1,15 +1,16 @@
 import type { GatsbyNode } from "gatsby";
 import { Client } from "@notionhq/client";
 import {
+  BlockObjectResponse,
   PageObjectResponse,
   TextRichTextItemResponse,
 } from "@notionhq/client/build/src/api-endpoints";
+import { readFile } from "fs/promises";
 import path from "path";
 import richTextToString from "./src/helpers/richTextToString";
 import titlePropToString from "./src/helpers/titlePropToString";
-import { DefaultTemplateContext } from "statikon";
+import { DefaultTemplateContext } from "nebula-atoms";
 import datePropToDate from "./src/helpers/datePropToDate";
-import provisionContent from "./src/helpers/provisionContent";
 import { COLORS } from "./src/enums/colors.enum";
 
 // Initializing a client
@@ -32,32 +33,36 @@ export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
 export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   const { createPage } = actions;
 
+  const TITLE = "IMROK.fr, le hub créatif de Romaric Ruga";
+
   /*
    * 1. PAGE [& CONTENTS] RETRIEVING
    */
 
-  const pages = (
-    await notion.databases.query({
-      database_id: process.env.DATABASE_ID as string,
-      filter: { property: "Contexte", select: { equals: "Page" } },
-    })
-  ).results as PageObjectResponse[];
+  const pagesCache = JSON.parse(
+    await readFile("./cache/pages/pages.json", "utf-8")
+  ) as PageObjectResponse[];
 
-  const _pages = await Promise.all(
-    pages.map((page) => provisionContent(page, notion))
+  const pages = await Promise.all(
+    pagesCache.map(async (page) => ({
+      page,
+      blocks: JSON.parse(
+        await readFile(`./cache/pages/pages/${page.id}/page.json`, "utf-8")
+      ) as BlockObjectResponse[],
+    }))
   );
 
-  /** These instructions shouldn't be activated for basic website. */
+  const articlesCache = JSON.parse(
+    await readFile("./cache/articles/pages.json", "utf-8")
+  ) as PageObjectResponse[];
 
-  const contents = (
-    await notion.databases.query({
-      database_id: process.env.DATABASE_ID as string,
-      filter: { property: "Contexte", select: { equals: "Contenu" } },
-    })
-  ).results as PageObjectResponse[];
-
-  const _contents = await Promise.all(
-    contents.map((page) => provisionContent(page, notion))
+  const articles = await Promise.all(
+    articlesCache.map(async (page) => ({
+      page,
+      blocks: JSON.parse(
+        await readFile(`./cache/articles/pages/${page.id}/page.json`, "utf-8")
+      ) as BlockObjectResponse[],
+    }))
   );
 
   /*
@@ -66,13 +71,10 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
 
   const sharedProps: Pick<
     DefaultTemplateContext,
-    "bg" | "text" | "navbar" | "contents" | "footer"
+    "navbar" | "contents" | "footer"
   > = {
-    bg: COLORS.DEEP,
-    text: COLORS.LIGHT,
     navbar: {
-      bg: COLORS.PSIK,
-      text: COLORS.GOLD,
+      title: "IMROK.fr",
       links: [
         {
           title: "Pensées",
@@ -88,11 +90,8 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
         },
       ],
     },
-    contents,
+    contents: articlesCache,
     footer: {
-      bg: COLORS.PSIK,
-      text: COLORS.LIGHT,
-      a: COLORS.GOLD,
       links: [
         {
           title: "Accueil",
@@ -119,7 +118,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
    * 3. PAGE [& CONTENTS] RENDERING
    */
 
-  _pages.forEach(({ page, blocks }) => {
+  pages.forEach(({ page, blocks }) => {
     const {
       Name: name,
       Url: url,
@@ -134,9 +133,14 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
           ? richTextToString(url.rich_text as TextRichTextItemResponse[])
           : page.id,
       context: {
-        title: name.type === "title" && titlePropToString(name),
+        pageTitle: `${
+          name.type === "title" && titlePropToString(name)
+        } | ${TITLE}`,
         blocks,
         head: {
+          title: `${
+            name.type === "title" && titlePropToString(name)
+          } | ${TITLE}`,
           description:
             description.type === "rich_text" &&
             richTextToString(
@@ -149,7 +153,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     });
   });
 
-  _contents.forEach(({ page: content, blocks }) => {
+  articles.forEach(({ page, blocks }) => {
     const {
       Name: name,
       Url: url,
@@ -158,29 +162,41 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       ["Créé le"]: createdAt,
       ["Publié le"]: publishedAt,
       ["Édité le"]: editedAt,
-    } = content.properties;
-    createPage({
-      component: path.resolve("./src/templates/default.template.tsx"),
-      path:
-        url.type === "rich_text"
-          ? richTextToString(url.rich_text as TextRichTextItemResponse[])
-          : content.id,
-      context: {
-        title: name.type === "title" && titlePropToString(name),
-        head: {
-          description:
-            description.type === "rich_text" &&
-            richTextToString(
-              description.rich_text as TextRichTextItemResponse[]
-            ),
-          noIndex: robots.type === "select" && robots.select?.name === "Masqué",
-        },
-        createdAt: createdAt.type === "date" && datePropToDate(createdAt),
-        publishedAt: publishedAt.type === "date" && datePropToDate(publishedAt),
-        editedAt: editedAt.type === "date" && datePropToDate(editedAt),
-        blocks,
-        ...sharedProps,
-      } as DefaultTemplateContext,
-    });
+    } = page.properties;
+    const _url =
+      url.type === "rich_text" &&
+      richTextToString(url.rich_text as TextRichTextItemResponse[]);
+    if (_url) {
+      createPage({
+        component: path.resolve("./src/templates/default.template.tsx"),
+        path: _url,
+        context: {
+          pageTitle: `${
+            name.type === "title" && titlePropToString(name)
+          } | ${TITLE}`,
+          head: {
+            description:
+              description.type === "rich_text" &&
+              richTextToString(
+                description.rich_text as TextRichTextItemResponse[]
+              ),
+            noIndex:
+              robots.type === "select" && robots.select?.name === "Masqué",
+          },
+          createdAt: createdAt.type === "date" && datePropToDate(createdAt),
+          publishedAt:
+            publishedAt.type === "date" && datePropToDate(publishedAt),
+          editedAt: editedAt.type === "date" && datePropToDate(editedAt),
+          blocks,
+          ...sharedProps,
+        } as DefaultTemplateContext,
+      });
+    } else {
+      console.info(
+        `URL manquant pour la page : ${
+          name.type === "title" && titlePropToString(name)
+        }`
+      );
+    }
   });
 };
