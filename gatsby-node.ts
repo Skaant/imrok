@@ -1,5 +1,4 @@
 import type { GatsbyNode } from "gatsby";
-import { Client } from "@notionhq/client";
 import {
   BlockObjectResponse,
   PageObjectResponse,
@@ -9,14 +8,12 @@ import { readFile } from "fs/promises";
 import path from "path";
 import richTextToString from "./src/helpers/richTextToString";
 import titlePropToString from "./src/helpers/titlePropToString";
-import { DefaultTemplateContext } from "nebula-atoms";
+import { DefaultTemplateContext, Link } from "nebula-atoms";
 import datePropToDate from "./src/helpers/datePropToDate";
-import { COLORS } from "./src/enums/colors.enum";
-
-// Initializing a client
-const notion = new Client({
-  auth: process.env.NOTION_TOKEN,
-});
+import { HomeTemplateContext } from "./src/templates/home.template";
+import { AllArticlesTemplateContext } from "./src/templates/all-articles.template";
+import { LinkWithCategory } from "./src/types/LinkWithCategory";
+import { CategoryTemplateContext } from "./src/templates/category.template";
 
 export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
   actions,
@@ -29,6 +26,18 @@ export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
     },
   });
 };
+
+function articleToLinkWithCategory({
+  properties: { Name: name, Url: url, ["Type de contenu"]: category },
+}: PageObjectResponse) {
+  return {
+    url:
+      url.type === "rich_text" &&
+      richTextToString(url.rich_text as TextRichTextItemResponse[]),
+    label: name.type === "title" && titlePropToString(name),
+    category: category.type === "select" && category.select?.name,
+  } as LinkWithCategory;
+}
 
 export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   const { createPage } = actions;
@@ -56,13 +65,24 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     await readFile("./cache/articles/pages.json", "utf-8")
   ) as PageObjectResponse[];
 
+  const articlesIndexByCategory: { [key: string]: number[] } = {};
+
   const articles = await Promise.all(
-    articlesCache.map(async (page) => ({
-      page,
-      blocks: JSON.parse(
-        await readFile(`./cache/articles/pages/${page.id}/page.json`, "utf-8")
-      ) as BlockObjectResponse[],
-    }))
+    articlesCache.map(async (page, index) => {
+      const prop = page.properties["Type de contenu"];
+      const category = prop.type === "select" && prop.select?.name;
+      if (category) {
+        if (!articlesIndexByCategory[category])
+          articlesIndexByCategory[category] = [];
+        articlesIndexByCategory[category].push(index);
+      }
+      return {
+        page,
+        blocks: JSON.parse(
+          await readFile(`./cache/articles/pages/${page.id}/page.json`, "utf-8")
+        ) as BlockObjectResponse[],
+      };
+    })
   );
 
   /*
@@ -77,16 +97,8 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       title: "IMROK.fr",
       links: [
         {
-          title: "Pensées",
-          path: "/pensees",
-        },
-        {
-          title: "Illustrations",
-          path: "/illustrations",
-        },
-        {
-          title: "Vidéos",
-          path: "/videos",
+          title: "Tous les articles",
+          path: "/articles",
         },
       ],
     },
@@ -97,17 +109,18 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
           title: "Accueil",
           path: "/",
         },
+        ...Object.entries(articlesIndexByCategory).map(
+          ([category, indexes]) => ({
+            title: category,
+            path: `/categories/${category
+              .slice(3)
+              .toLocaleLowerCase()
+              .replace(" ", "-")}`,
+          })
+        ),
         {
-          title: "Pensées",
-          path: "/pensees",
-        },
-        {
-          title: "Illustrations",
-          path: "/illustrations",
-        },
-        {
-          title: "Vidéos",
-          path: "/videos",
+          title: "Tous les articles",
+          path: "/articles",
         },
       ],
       contact: true,
@@ -115,8 +128,10 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   };
 
   /*
-   * 3. PAGE [& CONTENTS] RENDERING
+   * 3. CONTENT RENDERING
    */
+
+  // 3.1. PAGES
 
   pages.forEach(({ page, blocks }) => {
     const {
@@ -126,32 +141,100 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       Robots: robots,
     } = page.properties;
 
-    createPage({
-      component: path.resolve("./src/templates/default.template.tsx"),
-      path:
-        url.type === "rich_text"
-          ? richTextToString(url.rich_text as TextRichTextItemResponse[])
-          : page.id,
-      context: {
-        pageTitle: `${
-          name.type === "title" && titlePropToString(name)
-        } | ${TITLE}`,
-        blocks,
-        head: {
-          title: `${
-            name.type === "title" && titlePropToString(name)
-          } | ${TITLE}`,
-          description:
-            description.type === "rich_text" &&
+    let context:
+      | DefaultTemplateContext
+      | HomeTemplateContext
+      | AllArticlesTemplateContext = {
+      pageTitle: `${
+        name.type === "title" && titlePropToString(name)
+      } | ${TITLE}`,
+      blocks,
+      head: {
+        title: `${name.type === "title" && titlePropToString(name)} | ${TITLE}`,
+        description:
+          (description.type === "rich_text" &&
             richTextToString(
               description.rich_text as TextRichTextItemResponse[]
-            ),
-          noIndex: robots.type === "select" && robots.select?.name === "Masqué",
-        },
-        ...sharedProps,
-      } as DefaultTemplateContext,
+            )) ||
+          "",
+        noIndex:
+          (robots.type === "select" && robots.select?.name === "Masqué") ||
+          undefined,
+      },
+      ...sharedProps,
+    };
+
+    const slug =
+      url.type === "rich_text"
+        ? richTextToString(url.rich_text as TextRichTextItemResponse[])
+        : page.id;
+
+    let templateId = "default";
+
+    switch (slug) {
+      case "/":
+        templateId = "home";
+        context = {
+          ...context,
+          lastArticlesLink: articlesCache
+            .slice(0, 10)
+            .map(articleToLinkWithCategory),
+          categoriesPageLink: Object.entries(articlesIndexByCategory).map(
+            ([key, indexes]) => ({
+              url: `/categories/${key
+                .slice(3)
+                .toLocaleLowerCase()
+                .replace(" ", "-")}`,
+              label: `${key} (${indexes.length})`,
+            })
+          ),
+        } as HomeTemplateContext;
+        break;
+      case "/articles":
+        templateId = "all-articles";
+        context = {
+          ...context,
+          articlesLink: articlesCache.map(articleToLinkWithCategory),
+        } as AllArticlesTemplateContext;
+        break;
+    }
+
+    createPage({
+      component: path.resolve(`./src/templates/${templateId}.template.tsx`),
+      path: slug,
+      context,
     });
   });
+
+  // 3.2. CATEGORIES
+
+  Object.entries(articlesIndexByCategory).forEach(([category, indexes]) => {
+    createPage({
+      component: path.resolve("./src/templates/category.template.tsx"),
+      path: `/categories/${category
+        .slice(3)
+        .toLocaleLowerCase()
+        .replace(" ", "-")}`,
+      context: {
+        head: {
+          title: `${category} | ${TITLE}`,
+        },
+        pageTitle: `Catégorie d'articles ${category}`,
+        category,
+        articles: indexes
+          .map((index) => articlesCache[index])
+          .map(({ properties: { Name: name, Url: url } }) => ({
+            url:
+              url.type === "rich_text" &&
+              richTextToString(url.rich_text as TextRichTextItemResponse[]),
+            label: name.type === "title" && titlePropToString(name),
+          })),
+        ...sharedProps,
+      } as CategoryTemplateContext,
+    });
+  });
+
+  // 3.3. ARTICLES
 
   articles.forEach(({ page, blocks }) => {
     const {
@@ -171,10 +254,11 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
         component: path.resolve("./src/templates/default.template.tsx"),
         path: _url,
         context: {
-          pageTitle: `${
-            name.type === "title" && titlePropToString(name)
-          } | ${TITLE}`,
+          pageTitle: name.type === "title" && titlePropToString(name),
           head: {
+            title: `${
+              name.type === "title" && titlePropToString(name)
+            } | ${TITLE}`,
             description:
               description.type === "rich_text" &&
               richTextToString(

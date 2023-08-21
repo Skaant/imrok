@@ -85,10 +85,51 @@ footer {
   padding-top: 25vh;
 }
 
+#page-dates {
+  display: flex;
+  margin-bottom: 1.5rem;
+
+  > div {
+    background-color: $psik;
+    color: $light;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+
+    &:not(:last-child) {
+      margin-right: 1rem;
+    }
+  }
+}
+
 .callout-block {
   background-color: $psik;
 }
 
 .blockquote {
   background-color: rgba($psik, 0.35);
+}
+
+.links-list,
+.links-list-with-category {
+  list-style: none;
+  padding-left: 0;
+}
+
+.links-list-with-category {
+  a {
+    text-decoration: none;
+  }
+  span {
+    &:first-child {
+      background-color: $psik;
+      color: $light;
+      padding: 0 0.5rem;
+      border-radius: 1rem;
+      margin-right: 0.6rem;
+      font-size: 0.8rem;
+    }
+    &:last-child {
+      text-decoration: underline;
+    }
+  }
 }
