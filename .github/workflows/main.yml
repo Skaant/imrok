@@ -25,23 +25,56 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Checkout nebula-genesis
+        uses: actions/checkout@v3
+        with:
+          repository: abstract-core/nebula-genesis
+          path: nebula-genesis
+
       - name: Use Node.js 18
         uses: actions/setup-node@v3
         with:
           node-version: "18"
           cache: "npm"
 
-      - run: touch .env.production
-      - run: echo "WEBSITE_TITLE=IMROK.fr" > .env.production
-      - run: echo "NOTION_TOKEN=${{ secrets.NOTION_TOKEN }}" >> .env.production
-      - run: echo "DATABASE_ID=${{ secrets.DATABASE_ID }}" >> .env.production
+      - name: Enable Notion data cache
+        uses: actions/cache@v3
+        with:
+          key: notion-data-cache
+          path: ./cache
 
-      - run: npm i
-      - run: npm run build
-      - run: npm run build:client
-      - run: npm run build:medias
+      - name: Enable Notion files cache
+        uses: actions/cache@v3
+        with:
+          key: notion-files-cache
+          path: ./static
 
-      - name: FTP dev environment
+      - name: Download and cache Notion data
+        run: |
+          cd ./nebula-genesis
+          npm i
+          npx tsc
+          node index.js \
+            NOTION_TOKEN=${{ secrets.NOTION_TOKEN }} \
+            DATABASE_ID=${{ secrets.DATABASE_ID }} \
+            SITE_FOLDER_PATH=.. \
+            CACHE_FOLDER_NAME=pages \
+            ON_OR_AFTER=${{ vars.ON_OR_AFTER }} \
+            FILTERS='[{ "property": "Contexte", "select": { "equals": "Page" } }]'
+          node index.js \
+            NOTION_TOKEN=${{ secrets.NOTION_TOKEN }} \
+            DATABASE_ID=${{ secrets.DATABASE_ID }} \
+            SITE_FOLDER_PATH=.. \
+            CACHE_FOLDER_NAME=articles \
+            ON_OR_AFTER=${{ vars.ON_OR_AFTER }} \
+            FILTERS='[{ "property": "Contexte", "select": { "equals": "Contenu" } }]'
+
+      - name: Build website
+        run: |
+          npm i --force
+          npx gatsby build
+
+      - name: FTP prod environment
         uses: sebastianpopp/ftp-action@releases/v2
         with:
           host: ${{ secrets.FTP_SERVER }}

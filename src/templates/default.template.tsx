@@ -1,4 +1,6 @@
 import "../styles/global.scss";
-import { DefaultTemplate } from "nebula-atoms";
+import { Head, DefaultTemplate } from "nebula-atoms";
+
+export { Head };
 
 export default DefaultTemplate;
