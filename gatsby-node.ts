@@ -145,9 +145,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
       | DefaultTemplateContext
       | HomeTemplateContext
       | AllArticlesTemplateContext = {
-      pageTitle: `${
-        name.type === "title" && titlePropToString(name)
-      } | ${TITLE}`,
+      pageTitle: (name.type === "title" && titlePropToString(name)) || "",
       blocks,
       head: {
         title: `${name.type === "title" && titlePropToString(name)} | ${TITLE}`,
