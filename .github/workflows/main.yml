@@ -57,22 +57,20 @@ jobs:
           node node_modules/nebula-genesis/build/index.js \
             NOTION_TOKEN=${{ secrets.NOTION_TOKEN }} \
             DATABASE_ID=${{ secrets.DATABASE_ID }} \
-            SITE_FOLDER_PATH=.. \
+            SITE_FOLDER_PATH=. \
             CACHE_FOLDER_NAME=pages \
             ON_OR_AFTER=${{ vars.ON_OR_AFTER }} \
             FILTERS='[{ "property": "Contexte", "select": { "equals": "Page" } }]'
           node node_modules/nebula-genesis/build/index.js \
             NOTION_TOKEN=${{ secrets.NOTION_TOKEN }} \
             DATABASE_ID=${{ secrets.DATABASE_ID }} \
-            SITE_FOLDER_PATH=.. \
+            SITE_FOLDER_PATH=. \
             CACHE_FOLDER_NAME=articles \
             ON_OR_AFTER=${{ vars.ON_OR_AFTER }} \
             FILTERS='[{ "property": "Contexte", "select": { "equals": "Contenu" } }]'
 
       - name: Build website
-        run: |
-          npm i --force
-          npx gatsby build
+        run: npx gatsby build
 
       - name: FTP prod environment
         uses: sebastianpopp/ftp-action@releases/v2
