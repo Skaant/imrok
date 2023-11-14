@@ -79,7 +79,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     if (!bDateProp || bDateProp.type !== "date" || !bDateProp.date) return 1;
     const aDate = aDateProp.date.start;
     const bDate = bDateProp.date.start;
-    return bDate.localeCompare(aDate);
+    return aDate.localeCompare(bDate);
   });
 
   const articlesIndexByCategory: { [key: string]: number[] } = {};
