@@ -15,6 +15,9 @@ import { AllArticlesTemplateContext } from "./src/templates/all-articles.templat
 import { LinkWithCategory } from "./src/types/LinkWithCategory";
 import { CategoryTemplateContext } from "./src/templates/category.template";
 
+type PageProperty =
+  PageObjectResponse["properties"][keyof PageObjectResponse["properties"]];
+
 export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
   actions,
 }) => {
@@ -61,9 +64,23 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     }))
   );
 
-  const articlesCache = JSON.parse(
-    await readFile("./cache/articles/pages.json", "utf-8")
-  ) as PageObjectResponse[];
+  const articlesCache = (
+    JSON.parse(
+      await readFile("./cache/articles/pages.json", "utf-8")
+    ) as PageObjectResponse[]
+  ).sort((a, b) => {
+    const aDateProp =
+      ((a.properties?.["Édité le"] ||
+        a.properties?.["Publié le"]) as PageProperty) || false;
+    if (!aDateProp || aDateProp.type !== "date" || !aDateProp.date) return -1;
+    const bDateProp =
+      ((b.properties?.["Édité le"] ||
+        b.properties?.["Publié le"]) as PageProperty) || false;
+    if (!bDateProp || bDateProp.type !== "date" || !bDateProp.date) return 1;
+    const aDate = aDateProp.date.start;
+    const bDate = bDateProp.date.start;
+    return bDate.localeCompare(aDate);
+  });
 
   const articlesIndexByCategory: { [key: string]: number[] } = {};
 
