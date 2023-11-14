@@ -1,7 +1,7 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: Production website build & deployment
 
 on:
   push:
@@ -24,12 +24,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Checkout nebula-genesis
-        uses: actions/checkout@v3
-        with:
-          repository: abstract-core/nebula-genesis
-          path: nebula-genesis
 
       - name: Use Node.js 18
         uses: actions/setup-node@v3
@@ -66,6 +60,7 @@ jobs:
             DATABASE_ID=${{ secrets.DATABASE_ID }} \
             SITE_FOLDER_PATH=. \
             CACHE_FOLDER_NAME=articles \
+            REINIT_CACHE=${{ vars.REINIT_CACHE }} \
             ON_OR_AFTER=${{ vars.ON_OR_AFTER }} \
             FILTERS='[{ "property": "Contexte", "select": { "equals": "Contenu" } }]'
 
