@@ -19,7 +19,7 @@ const CategoryTemplate = ({
 }: PageProps<undefined, CategoryTemplateContext>) => (
   <EmptyTemplate {...props}>
     <>
-      <h2>Tous les articles de la catégorie {category}</h2>
+      <p>Tous les articles de la catégorie {category}</p>
       <LinksList links={articles} />
     </>
   </EmptyTemplate>

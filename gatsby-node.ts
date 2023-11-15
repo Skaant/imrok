@@ -71,11 +71,13 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
   ).sort((a, b) => {
     const aDateProp =
       ((a.properties?.["Édité le"] ||
-        a.properties?.["Publié le"]) as PageProperty) || false;
+        a.properties?.["Publié le"] ||
+        a.properties?.["Créé le"]) as PageProperty) || false;
     if (!aDateProp || aDateProp.type !== "date" || !aDateProp.date) return -1;
     const bDateProp =
       ((b.properties?.["Édité le"] ||
-        b.properties?.["Publié le"]) as PageProperty) || false;
+        b.properties?.["Publié le"] ||
+        a.properties?.["Créé le"]) as PageProperty) || false;
     if (!bDateProp || bDateProp.type !== "date" || !bDateProp.date) return 1;
     const aDate = aDateProp.date.start;
     const bDate = bDateProp.date.start;
@@ -234,7 +236,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
         head: {
           title: `${category} | ${TITLE}`,
         },
-        pageTitle: `Catégorie d'articles ${category}`,
+        pageTitle: `Catégorie ${category}`,
         category,
         articles: indexes
           .map((index) => articlesCache[index])
