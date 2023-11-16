@@ -77,11 +77,11 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     const bDateProp =
       ((b.properties?.["Édité le"] ||
         b.properties?.["Publié le"] ||
-        a.properties?.["Créé le"]) as PageProperty) || false;
+        b.properties?.["Créé le"]) as PageProperty) || false;
     if (!bDateProp || bDateProp.type !== "date" || !bDateProp.date) return 1;
     const aDate = aDateProp.date.start;
     const bDate = bDateProp.date.start;
-    return bDate.localeCompare(aDate);
+    return aDate.localeCompare(bDate);
   });
 
   const articlesIndexByCategory: { [key: string]: number[] } = {};
