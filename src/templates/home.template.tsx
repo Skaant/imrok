@@ -10,6 +10,7 @@ import {
 import { PageProps } from "gatsby";
 import LinksListWithCategory from "../components/LinksListWithCategory";
 import { LinkWithCategory } from "../types/LinkWithCategory";
+import Navbar from "../components/Navbar";
 
 export type HomeTemplateContext = CustomizableTemplateContext & {
   lastArticlesLink: LinkWithCategory[];
@@ -21,6 +22,7 @@ const HomeTemplate = ({
 }: PageProps<undefined, HomeTemplateContext>) => (
   <CustomizableTemplate
     {...props}
+    navbar={<Navbar />}
     staticBlocks={{
       ["derniers-articles"]: <LinksListWithCategory links={lastArticlesLink} />,
       ["toutes-les-categories"]: <LinksList links={categoriesPageLink} />,

@@ -1,6 +1,10 @@
-import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import {
+  PageObjectResponse,
+  TextRichTextItemResponse,
+} from "@notionhq/client/build/src/api-endpoints";
 import { Article } from "../types/Article";
 import titlePropToString from "./titlePropToString";
+import richTextToString from "./richTextToString";
 
 export function getArticleFromPageObjectResponse(
   page: PageObjectResponse
@@ -21,6 +25,12 @@ export function getArticleFromPageObjectResponse(
   return {
     ...page,
     id,
+    url:
+      properties["Url"].type === "rich_text"
+        ? richTextToString(
+            properties["Url"].rich_text as TextRichTextItemResponse[]
+          )
+        : `/oups-${id}`,
     title:
       properties["Name"].type === "title"
         ? titlePropToString(properties["Name"])

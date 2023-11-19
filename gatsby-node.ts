@@ -14,6 +14,8 @@ import { HomeTemplateContext } from "./src/templates/home.template";
 import { AllArticlesTemplateContext } from "./src/templates/all-articles.template";
 import { LinkWithCategory } from "./src/types/LinkWithCategory";
 import { CategoryTemplateContext } from "./src/templates/category.template";
+import { getArticlesCache } from "./src/helpers/getArticlesCache";
+import { Article } from "./src/types/Article";
 
 type PageProperty =
   PageObjectResponse["properties"][keyof PageObjectResponse["properties"]];
@@ -31,14 +33,16 @@ export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
 };
 
 function articleToLinkWithCategory({
-  properties: { Name: name, Url: url, ["Type de contenu"]: category },
-}: PageObjectResponse) {
+  url,
+  title,
+  category,
+  date,
+}: PageObjectResponse & Article) {
   return {
-    url:
-      url.type === "rich_text" &&
-      richTextToString(url.rich_text as TextRichTextItemResponse[]),
-    label: name.type === "title" && titlePropToString(name),
-    category: category.type === "select" && category.select?.name,
+    url,
+    label: title,
+    category,
+    date,
   } as LinkWithCategory;
 }
 
@@ -64,25 +68,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
     }))
   );
 
-  const articlesCache = (
-    JSON.parse(
-      await readFile("./cache/articles/pages.json", "utf-8")
-    ) as PageObjectResponse[]
-  ).sort((a, b) => {
-    const aDateProp =
-      ((a.properties?.["Édité le"] ||
-        a.properties?.["Publié le"] ||
-        a.properties?.["Créé le"]) as PageProperty) || false;
-    if (!aDateProp || aDateProp.type !== "date" || !aDateProp.date) return -1;
-    const bDateProp =
-      ((b.properties?.["Édité le"] ||
-        b.properties?.["Publié le"] ||
-        b.properties?.["Créé le"]) as PageProperty) || false;
-    if (!bDateProp || bDateProp.type !== "date" || !bDateProp.date) return 1;
-    const aDate = aDateProp.date.start;
-    const bDate = bDateProp.date.start;
-    return aDate.localeCompare(bDate);
-  });
+  const articlesCache = await getArticlesCache();
 
   const articlesIndexByCategory: { [key: string]: number[] } = {};
 
@@ -240,11 +226,11 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions }) => {
         category,
         articles: indexes
           .map((index) => articlesCache[index])
-          .map(({ properties: { Name: name, Url: url } }) => ({
-            url:
-              url.type === "rich_text" &&
-              richTextToString(url.rich_text as TextRichTextItemResponse[]),
-            label: name.type === "title" && titlePropToString(name),
+          .map(({ url, title, date }) => ({
+            url,
+            label: title,
+            category,
+            date,
           })),
         ...sharedProps,
       } as CategoryTemplateContext,

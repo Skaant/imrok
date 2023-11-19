@@ -23,7 +23,7 @@
 @import "../../node_modules/bootstrap/scss/grid";
 @import "../../node_modules/bootstrap/scss/helpers";
 
-@import "../../node_modules/bootstrap/scss/navbar";
+// @import "../../node_modules/bootstrap/scss/navbar";
 @import "../../node_modules/bootstrap/scss/badge";
 @import "../../node_modules/bootstrap/scss/transitions";
 @import "../../node_modules/bootstrap/scss/buttons";
@@ -64,12 +64,20 @@ h6 {
   font-family: $font-lemon;
 }
 
-.navbar {
-  background-color: $psik;
+#navbar img {
+  width: 80%;
+  max-width: 800px;
 }
 
-.navbar-brand {
+#site-title {
+  position: absolute;
+  top: calc(20px + 4vw);
+  left: 2vw;
+  font-size: calc(1.5rem + 2vw);
+  line-height: calc(1rem + 2vw);
   font-family: $font-lemon;
+  color: $highbs;
+  text-decoration: none;
 }
 
 footer {
@@ -81,8 +89,21 @@ footer {
   min-height: 100vh;
 }
 
+figure,
+figure img {
+  max-width: 100%;
+}
+
+.figure-caption {
+  color: $psank;
+  font-size: 1rem;
+}
+
 #page-header {
   padding-top: 25vh;
+}
+#thumbnail + #page-header {
+  padding-top: 8vh;
 }
 
 #page-dates {
@@ -120,16 +141,38 @@ footer {
     text-decoration: none;
   }
   span {
-    &:first-child {
-      background-color: $psik;
-      color: $light;
+    &:first-child,
+    &:nth-child(2) {
       padding: 0 0.5rem;
       border-radius: 1rem;
       margin-right: 0.6rem;
       font-size: 0.8rem;
     }
+    &:first-child {
+      background-color: $psik;
+      color: $light;
+    }
+    &:nth-child(2) {
+      background-color: $psank;
+      color: $deep;
+    }
     &:last-child {
       text-decoration: underline;
     }
+  }
+}
+
+.calls-to-action > a {
+  background-color: $psank;
+  margin-right: 8px;
+  margin-top: 0.8rem;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  text-decoration: none;
+  display: inline-block;
+  color: $deep;
+  &:first-child {
+    background-color: $psik;
+    color: $light;
   }
 }

@@ -1,3 +1,3 @@
 import { Link } from "nebula-atoms";
 
-export type LinkWithCategory = Link & { category: string };
+export type LinkWithCategory = Link & { category: string } & { date?: string };
