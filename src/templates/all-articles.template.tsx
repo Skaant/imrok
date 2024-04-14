@@ -8,6 +8,7 @@ import {
 import { PageProps } from "gatsby";
 import LinksListWithCategory from "../components/LinksListWithCategory";
 import { LinkWithCategory } from "../types/LinkWithCategory";
+import Navbar from "../components/Navbar";
 
 export type AllArticlesTemplateContext = CustomizableTemplateContext & {
   articlesLink: LinkWithCategory[];
@@ -18,6 +19,7 @@ const AllArticlesTemplate = ({
 }: PageProps<undefined, AllArticlesTemplateContext>) => (
   <CustomizableTemplate
     {...props}
+    navbar={<Navbar />}
     staticBlocks={{
       ["tous-les-articles"]: <LinksListWithCategory links={articlesLink} />,
     }}

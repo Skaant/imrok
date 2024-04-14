@@ -67,19 +67,29 @@ h6 {
 #navbar img {
   width: 100%;
   min-width: 800px;
-  float: right;
-}
-
-#site-title {
   position: absolute;
-  top: 4.5vw;
-  left: 4.5vw;
+  top: 0;
+  right: 0;
+  z-index: -1;
+}
+#navbar a {
+  margin-top: 4.5vw;
+  margin-left: 4.5vw;
+  font-family: $font-pangaia;
+  display: flex;
+  flex-direction: column;
+  gap: -4px;
+  text-decoration: none;
+  > :last-child {
+    font-size: calc(0.8rem + 1vw);
+    color: white;
+  }
+}
+#site-title {
   font-size: calc(1.5rem + 4vw);
   line-height: calc(1rem + 4vw);
-  font-family: $font-pangaia;
-  color: $highbs;
   letter-spacing: 4px;
-  text-decoration: none;
+  color: $highbs;
 }
 
 footer {
@@ -102,7 +112,10 @@ figure img {
 }
 
 #page-header {
-  padding-top: 10vh;
+  padding-top: 42vh;
+}
+#thumbnail {
+  padding-top: 15vh;
 }
 #thumbnail + #page-header {
   padding-top: 8vh;
