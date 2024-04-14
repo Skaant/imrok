@@ -3,9 +3,9 @@ import React from "react";
 export default function Navbar() {
   return (
     <div id="navbar">
-      <img src="/navbar.svg" />
+      <img src="/banniere.svg" />
       <a id="site-title" href="/">
-        Imrok.fr
+        IMROK.fr
       </a>
     </div>
   );

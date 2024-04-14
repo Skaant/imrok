@@ -4,7 +4,7 @@ public
 src/gatsby-types.d.ts
 .env.*
 src/static/medias/*
-!src/static/medias/placeholder.md
 cache
 routines.sh
-static
+static/*
+!static/banniere.svg

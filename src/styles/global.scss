@@ -32,12 +32,12 @@
 @import "../../node_modules/bootstrap/scss/utilities/api";
 
 @font-face {
-  font-family: $font-lemon;
-  src: url("../static/fonts/Lemon-Regular.ttf");
+  font-family: $font-pangaia;
+  src: url("../static/fonts/PPPangaia-Bold.otf");
 }
 
-.font-lemon {
-  font-family: $font-lemon;
+.font-pangaia {
+  font-family: $font-pangaia;
 }
 
 @font-face {
@@ -61,22 +61,24 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: $font-lemon;
+  font-family: $font-pangaia;
 }
 
 #navbar img {
-  width: 80%;
-  max-width: 800px;
+  width: 100%;
+  min-width: 800px;
+  float: right;
 }
 
 #site-title {
   position: absolute;
-  top: calc(20px + 4vw);
-  left: 2vw;
-  font-size: calc(1.5rem + 2vw);
-  line-height: calc(1rem + 2vw);
-  font-family: $font-lemon;
+  top: 4.5vw;
+  left: 4.5vw;
+  font-size: calc(1.5rem + 4vw);
+  line-height: calc(1rem + 4vw);
+  font-family: $font-pangaia;
   color: $highbs;
+  letter-spacing: 4px;
   text-decoration: none;
 }
 
@@ -100,7 +102,7 @@ figure img {
 }
 
 #page-header {
-  padding-top: 25vh;
+  padding-top: 10vh;
 }
 #thumbnail + #page-header {
   padding-top: 8vh;
